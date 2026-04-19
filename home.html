@@ -766,7 +766,7 @@ async function sbLoad(){
         // Also update localStorage
         try { localStorage.setItem('hc', JSON.stringify(S)); } catch(e){}
         // Re-render with fresh data
-        renderCal();renderG();renderClean();renderNeeds();renderAppts();renderSavedLists();tdRender();
+        renderCal();renderG();renderClean();renderNeeds();renderAppts();renderSavedLists();tdRender();renderPhoto();
       }
     }
   } catch(e){ console.log('Supabase unavailable, using local data'); }
@@ -1701,6 +1701,17 @@ function loadHomePhoto(input){
  };reader.readAsDataURL(file);
 }
 
+function renderPhoto(){
+  var photoSrc = S.photo || null;
+  try{ if(!photoSrc) photoSrc=localStorage.getItem('hc-photo'); }catch(e){}
+  if(photoSrc){
+    const img=document.getElementById('home-avatar-img');
+    const av=document.getElementById('home-avatar');
+    if(img){img.src=photoSrc;img.style.display='block';}
+    if(av)av.style.display='none';
+  }
+}
+
 // INIT — called after Supabase loads data
 function initApp(){
   // Ensure defaults
@@ -1748,14 +1759,7 @@ function initApp(){
   })();
 
   // Restore photo from Supabase or localStorage
-  var photoSrc = S.photo || null;
-  try{ if(!photoSrc) photoSrc=localStorage.getItem('hc-photo'); }catch(e){}
-  if(photoSrc){
-    const img=document.getElementById('home-avatar-img');
-    const av=document.getElementById('home-avatar');
-    if(img){img.src=photoSrc;img.style.display='block';}
-    if(av)av.style.display='none';
-  }
+  renderPhoto();
 
   if(!S.threads) S.threads = [];
   renderCal();renderG();renderClean();renderNeeds();renderAppts();renderSavedLists();
@@ -1784,6 +1788,7 @@ function initApp(){
         S = rows[0].data;
         renderCal();renderG();renderClean();renderNeeds();renderAppts();renderSavedLists();
         tdRender();
+        renderPhoto();
       }
     } catch(e){}
   }, 30000);
